@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Minesweeper API Test</title>
+  <style>
+    .board {
+      display: grid;
+      gap: 2px;
+    }
+    .cell {
+      width: 30px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid black;
+      cursor: pointer;
+    }
+    .revealed {
+      background-color: #ddd;
+    }
+    .unrevealed {
+      background-color: #bbb;
+    }
+    .flagged {
+      background-color: #ff0;
+    }
+  </style>
+</head>
+<body>
+  <h1>Minesweeper API Test</h1>
+  <button id="start-game">Start Game</button>
+  <p id="game-status"></p>
+  <p id="timer">Time: 00:00</p>
+  <div id="board" class="board"></div>
+  <script>
+    const startButton = document.getElementById('start-game');
+    const boardElement = document.getElementById('board');
+    const gameStatusElement = document.getElementById('game-status');
+    const timerElement = document.getElementById('timer');
+
+    let board = [];
+    let gameStatus = '';
+    let timer = 0;
+    let interval = null;
+
+    startButton.addEventListener('click', startNewGame);
+
+    async function startNewGame() {
+      console.log("Starting new game...");
+      try {
+        const response = await fetch('http://localhost:5000/start', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ width: 10, height: 10, mines: 10 })
+        });
+        const data = await response.json();
+        console.log("Game started:", data);
+        board = data.board;
+        gameStatus = 'Game started';
+        gameStatusElement.textContent = gameStatus;
+        renderBoard();
+        timer = 0;
+        clearInterval(interval);
+        interval = setInterval(() => {
+          timer++;
+          timerElement.textContent = `Time: ${formatTime(timer)}`;
+        }, 1000);
+      } catch (error) {
+        console.error("Error starting game:", error);
+      }
+    }
+
+    async function handleCellClick(x, y) {
+      const data = { x, y };
+      console.log("Sending data:", data);
+      try {
+        const response = await fetch('http://localhost:5000/reveal', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(data)
+        });
+        const responseData = await response.json();
+        console.log("Reveal response:", responseData);
+        board = responseData.board;
+        gameStatus = responseData.result;
+        gameStatusElement.textContent = gameStatus;
+        if (gameStatus === 'Game Over' || gameStatus === 'Won') {
+          clearInterval(interval);
+        }
+        renderBoard();
+      } catch (error) {
+        console.error("Error revealing cell:", error);
+      }
+    }
+
+    async function handleCellRightClick(event, x, y) {
+      event.preventDefault();
+      const data = { x, y };
+      console.log("Flagging cell:", data);
+      try {
+        const response = await fetch('http://localhost:5000/flag', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(data)
+        });
+        const responseData = await response.json();
+        console.log("Flag response:", responseData);
+        board = responseData.board;
+        renderBoard();
+      } catch (error) {
+        console.error("Error flagging cell:", error);
+      }
+    }
+
+    function renderBoard() {
+      boardElement.style.gridTemplateColumns = `repeat(${board[0].length}, 30px)`;
+      boardElement.innerHTML = '';
+      for (let y = 0; y < board.length; y++) {
+        for (let x = 0; x < board[y].length; x++) {
+          const cell = document.createElement('div');
+          cell.className = 'cell';
+          cell.classList.add(board[y][x].revealed ? 'revealed' : 'unrevealed');
+          if (board[y][x].flagged) cell.classList.add('flagged');
+          cell.textContent = board[y][x].revealed && board[y][x].mine ? '*' : board[y][x].revealed ? board[y][x].adjacent_mines || '' : '';
+          cell.addEventListener('click', () => handleCellClick(x, y));
+          cell.addEventListener('contextmenu', (event) => handleCellRightClick(event, x, y));
+          boardElement.appendChild(cell);
+        }
+      }
+    }
+
+    function formatTime(time) {
+      const minutes = Math.floor(time / 60);
+      const seconds = time % 60;
+      return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+    }
+  </script>
+</body>
+</html>

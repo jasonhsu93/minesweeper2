@@ -32,3 +32,5 @@ app.use(cors({\
   credentials: true,\
   allowedHeaders: ['Content-Type', 'Authorization']\
 }));\
+\
+Make sure to restart the backend server.

@@ -21,3 +21,13 @@ Click "Restart Game" to restart a game.
 Left-click on squares to reveal them.
 Right-click on squares to flag them.
 The game ends when all non-mine squares are revealed or a mine is clicked.
+
+# Optional 
+To test API calls, open the index.html file in a browser and interact with the file. One may need to go to minesweeper2/minesweeper-backend/index.js to modify the Middleware so that API calls are accepted. \ like this:
+// Middleware to handle CORS and allow credentials
+app.use(cors({
+  origin: '*', // Allow any origin for testing APIs
+  //origin: 'http://localhost:3000',//comment this out when testing for API calls
+  credentials: true,
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));

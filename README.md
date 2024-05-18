@@ -28,7 +28,7 @@ To test API calls, open the index.html file in a browser and interact with the f
 // Middleware to handle CORS and allow credentials\
 app.use(cors({\
   origin: '*', // Allow any origin for testing APIs\
-  //origin: 'http://localhost:3000',//comment this out when testing for API calls\
+  //origin: 'http://localhost:3000', //comment this out when testing for API calls\
   credentials: true,\
   allowedHeaders: ['Content-Type', 'Authorization']\
 }));\

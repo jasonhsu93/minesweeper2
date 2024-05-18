@@ -2,7 +2,8 @@
 This project implements a Minesweeper game using React for the frontend and Node.js for the backend. The game follows the classic Minesweeper rules and includes features like safe first click, flagging cells, and a timer to track the game duration.
 
 # Installation Prerequisites
-Node.js (v14 or higher)
+Clone the repo\
+Node.js (v14 or higher)\
 npm (v6 or higher)
 
 # Backend Setup

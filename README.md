@@ -11,7 +11,7 @@ npm (v6 or higher)
 3. Start the backend server: node index.js
 
 # Frontend Setup 
-1. cd minesweeper2/frontend
+1. cd minesweeper2/minesweeper
 2. Install the frontend dependencies: npm install
 3. Start the frontend: npm start
 
